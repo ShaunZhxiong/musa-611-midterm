@@ -46,15 +46,17 @@ function calcCurrentSlideIndex() {
   } else if (currentSlideIndex != i-1) {
     currentSlideIndex = i - 1;
 		if (currentSlideIndex === 0) {
+			init();
 			layerGroup.clearLayers();
 			} else if (currentSlideIndex === 1) {
 			updateDogRunsMarkers(dogRuns);
 			} else if (currentSlideIndex === 2) {
-			updatedogLicensesMarkers(dogLicenses);
-			updatedogLicensesSmallBounds();
+			updateDogRunsBiggest(dogRuns);
 			} else if (currentSlideIndex === 3) {
 			updatedogLicensesMarkers(dogLicenses);
 			} else if (currentSlideIndex === 4) {
+			updatedogLicensesFarest(dogLicenses);
+			} else if (currentSlideIndex === 5) {
 			updatePetStoresMarkers(petStores);
 			};
   }
@@ -71,8 +73,8 @@ let updatedogLicensesMarkers = (dogLicenses) => {
   /* celar layer*/
   layerGroup.clearLayers();
   /* fly to bounds*/
-  let dogLicensesBound = L.geoJSON(dogLicenses,{style: dogRunsStyle});
-  dogMap.flyToBounds(dogLicensesBound.getBounds());
+  let dogLicensesBound = L.geoJSON(dogLicenses);
+  dogMap.flyToBounds(dogLicensesBoundSmall);
   /* Loop each dog store to plot it*/
   dogLicenses.forEach(dogLicense => {
     let circleMarker = L.circle([dogLicense.geometry.coordinates[1], dogLicense.geometry.coordinates[0]],40, dogLicensesStyle)
@@ -88,7 +90,31 @@ let updatedogLicensesMarkers = (dogLicenses) => {
   });
 };
 
-let updatedogLicensesSmallBounds = function() {dogMap.flyToBounds(dogLicensesBoundSmall)};
+let updatedogLicensesFarest = (dogLicenses) => {
+  /* FIND THE BIGGEST ONE*/
+  dogLicenses.forEach(dogLicense => {
+		if (dogLicense.properties.GEOID === 98363) {
+			let farestLicense = dogLicense;
+		/* celar layer*/
+  		layerGroup.clearLayers();	
+		/* fly to bounds*/
+			let dogLicensesBound = L.latLng(farestLicense.geometry.coordinates[1], farestLicense.geometry.coordinates[0]);
+			dogMap.flyToBounds(dogLicensesBound.toBounds(2000));
+			console.log(L.rectangle(dogLicensesBound.toBounds(50)));
+		/* PLOT IT*/
+			let circleMarker = L.circle([farestLicense.geometry.coordinates[1], farestLicense.geometry.coordinates[0]],40, dogLicensesStyle)
+			.bindTooltip(farestLicense.properties.GEOID.toString())
+			.addTo(layerGroup);
+			let dogLicensesGEOID = farestLicense.properties.GEOID.toString();
+		/* Add event listener*/
+			circleMarker.addEventListener('click', () => {
+				circleMarker.bindPopup(
+					`<h6>${dogLicensesGEOID}</h6>`
+					).openPopup();
+			});
+		};
+  });
+};
 
 /* show the dog runs */
 
@@ -116,6 +142,32 @@ let updateDogRunsMarkers = (dogRuns) => {
         `<h6>${dogRunName}</h6>`
         ).openPopup();
     });
+  });
+};
+
+let updateDogRunsBiggest = (dogRuns) => {
+  /* FIND THE BIGGEST ONE*/
+  dogRuns.forEach(dogRun => {
+		if (dogRun.properties.name === "Rockaway Freeway Dog Park") {
+			let biggestDogRun = dogRun;
+		/* celar layer*/
+  		layerGroup.clearLayers();	
+		/* fly to bounds*/
+			let dogRunBound = L.geoJSON([biggestDogRun],{style: dogRunsStyle});
+			dogMap.flyToBounds(dogRunBound.getBounds().pad(0.75));
+			console.log(dogRunBound.getBounds());
+		/* PLOT IT*/
+			let dogRunpolygon = L.geoJSON([biggestDogRun],{style: dogRunsStyle})
+			.bindTooltip(biggestDogRun.properties.name)
+			.addTo(layerGroup);
+			let dogRunName = biggestDogRun.properties.name
+		/* Add event listener*/
+			dogRunpolygon.addEventListener('click', () => {
+				dogRunpolygon.bindPopup(
+					`<h6>${dogRunName}</h6>`
+					).openPopup();
+			});
+		};
   });
 };
 
@@ -170,8 +222,6 @@ var verticalAlign, line1Diff, line2Diff, line3Diff, line4Diff, iterations, itera
 let startRGB = [100, 255, 255];
 let endRGB   = [220, 165, 163];
 let fullColorSet = [];
-
-init();
 
 function init() {
   
