@@ -75,14 +75,15 @@ let zipCodeBoundary = (zipcode) => {
   dogLicenseGroup.clearLayers();
   const dataUrl = `data/zipcodePoly/${zipcode}.geojson`;
   $.getJSON(dataUrl, function(data) {
+    
     let dogLicensesPoly = L.geoJson(data,dogLicensesStyle).addTo(dogLicenseGroup)
       .addEventListener('click', () => {
         dogLicenseGroup.clearLayers();
-        if (dogLicense.properties.GEOID !== 98363) {
-          updatedosgLicensesMarkers(dogLicenses);
+        if (zipcode !== 98363) {
+          updatedogLicensesMarkers(dogLicenses);
         } else updatedogLicensesFarest(dogLicenses);
       });
-    dogMap.flyToBounds(dogLicensesPoly.getBounds());
+      dogMap.flyToBounds(dogLicensesPoly.getBounds());
   }
 )};
 
@@ -224,7 +225,6 @@ let updateDogRunsBiggest = (dogRuns) => {
       /* fly to bounds*/
       let dogRunBound = L.geoJSON([biggestDogRun], { style: dogRunsStyle });
       dogMap.flyToBounds(dogRunBound.getBounds().pad(0.75));
-      console.log(dogRunBound.getBounds());
       /* PLOT IT*/
       let dogRunpolygon = L.geoJSON([biggestDogRun], { style: dogRunsStyle })
         .bindTooltip(biggestDogRun.properties.name)
