@@ -58,8 +58,8 @@ function draw() {
 
 // Draw the single lines of text.
 function drawText(x, y) {
-  context.fillText("Doggy", x, y + line4Diff);
-  context.strokeText("Doggy", x, y + line4Diff);
+  context.fillText("DDDogs", x, y + line4Diff);
+  context.strokeText("DDDogs", x, y + line4Diff);
   context.fillText("in", x, y + line3Diff);
   context.strokeText("in", x, y + line3Diff);
   context.fillText("New York City", x, y + line2Diff);
