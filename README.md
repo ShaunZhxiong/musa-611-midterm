@@ -20,7 +20,7 @@ These are three questions wanted be answered in this project.
 * Census Data: Translator of Zip Code to Geolocations 
 * Open Street Map Data: Pet Supply Stores
 
-#### Step 2: [Slide Content]("data/slides.js")
+#### Step 2: [Slide Content](data/slides.js)
 
 #### Step 3: App Behavior & Start writing!
 
