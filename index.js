@@ -193,7 +193,7 @@ const updateDogRunsBiggest = (dogRuns) => {
           `<h6>${dogRun.properties.name}</h6>
           <ul>
             <li>Zipcode:${dogRun.properties.zipcode} </li>
-            <li>Area: </li>
+            <li>Area: ${Math.round(dogRun.properties.area)}</li>
             <li><a href='https://www.google.com/search?q=${dogRun.properties.name}'>More Info</a></li>
           </ul>`,
         ).openPopup();
