@@ -159,13 +159,13 @@ const updateDogRunsMarkers = (dogRuns) => {
     /* Add event listener */
     dogRunpolygon.addEventListener('click', () => {
       dogMap.flyToBounds(dogRunpolygon.getBounds());
-      dogRunpolygon.bindPopup(
+      dogRunpolygon.bindTooltip(
         `<h6>${dogRun.properties.name}</h6>
         <ul>
           <li>Zipcode:${dogRun.properties.zipcode} </li>
           <li>Area: ${Math.round(dogRun.properties.area)} sqm</li>
           <li><a href='https://www.google.com/search?q=${dogRun.properties.name}' target='_blank'>More Info</a></li></ul>`,
-      ).openPopup();
+      ).addTo(layerGroup);
       dogRunpolygon.addEventListener('click', () => {
         updateDogRunsMarkers(dogRuns);
       });
