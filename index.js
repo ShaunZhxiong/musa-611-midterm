@@ -1,6 +1,8 @@
 const dogMap = L.map('dog-map', { scrollWheelZoom: false }).setView([40.72995787857809, -73.99271702327988], 13);
 const layerGroup = L.layerGroup().addTo(dogMap);
+const dogFriendGroup = L.layerGroup().addTo(dogMap);
 const dogLicenseGroup = L.layerGroup().addTo(dogMap);
+const apiHost = 'http://localhost:3000';
 
 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
@@ -240,6 +242,39 @@ const updatePetStoresMarkers = (petStores) => {
   });
 };
 
+/* show the dog dating */
+const icon = L.icon({
+  iconUrl: 'dogPin.png',
+  iconSize: [30, 45],
+  iconAnchor: [15, 45]
+});
+
+let dogFriendLayer = null;
+const loadDogFile = function () {
+  fetch(`${apiHost}/dogprofiles/`)
+    .then(resp => resp.json())
+    .then(data => {
+      // console.log(data);
+      dogFriendLayer = L.geoJSON(data, {
+        pointToLayer: (feature, latlng) => {
+          return L.marker(latlng, { icon })
+          .bindTooltip(feature.properties.Name)
+          .bindPopup(
+            `<ul>
+              <li>Name: ${feature.properties.Name}</li>
+              <li>Gender: ${feature.properties.Gender}</li>
+              <li>Date of Birth: ${feature.properties.DOB}</li>
+              <li>Contat: ${feature.properties.Email}</li>
+              <li>Availability: ${feature.properties.Availability}</li>
+            </ul>`
+            ).openPopup();
+        },
+      });
+      dogFriendLayer.addTo(dogFriendGroup);
+    });
+};
+
+
 /* current slide index */
 let currentSlideIndex = -1;
 
@@ -272,7 +307,11 @@ function calcCurrentSlideIndex() {
       } else if (currentSlideIndex === 4) {
         updatedogLicensesFarest(dogLicenses);
       } else if (currentSlideIndex === 5) {
+        dogFriendGroup.clearLayers();
         updatePetStoresMarkers(petStores);
+      } else if (currentSlideIndex === 6) {
+        layerGroup.clearLayers();
+        loadDogFile();
       }
     }
   }
