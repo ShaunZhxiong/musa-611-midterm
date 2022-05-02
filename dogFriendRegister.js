@@ -75,7 +75,7 @@ const handlePointSelection = function (evt) {
     clickedPoint.geometry.coordinates[1],
     clickedPoint.geometry.coordinates[0],
   ]);
-  reportMarkers.addLayer(reportMarker);
+  reportMarker.addTo(reportMarkers);
   selectLocationContinueBtn.disabled = false;       // (4)
 };
 
@@ -84,7 +84,8 @@ const showDetailsStep = function () {
   console.log('Showing the details step of Registeration.');
   openRegisterForm();                                      // (1)
   hideAllRegisterSteps();
-  dogMap.addLayer(reportMarker);                                   // (3)
+  reportMarker.addTo(reportMarkers);
+  // dogMap.addLayer(reportMarker);                                   // (3)
   detailsStepEl.classList.remove('hidden');                     // (4)
 };
 

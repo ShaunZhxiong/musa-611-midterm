@@ -26,6 +26,21 @@ const petStoresBound = [
   [40.660847697284815, -74.0478515625],
 ];
 
+const dogHotelBounds = [
+  [40.714, -74.00732809334068],
+  [40.773, -73.92063619987687],
+]
+
+const animalHospitalBounds = [
+  [40.70312926895238, -74.05706625030707],
+  [40.813913064585954, -73.93711569084002],
+]
+
+const getAnimalsBounds = [
+  [40.50116870956662, -73.86125551107805],
+  [40.946431509357446, -73.70928444948223]
+]
+/* Slide 3 */
 /* show the dog breeds */
 
 const dogLicensesStyle = {
@@ -109,7 +124,7 @@ let zipCodedogLicenses = (selectZipcode) => {
     }
   });
 };
-
+/* Slide 4 */
 let updatedogLicensesFarest = (dogLicenses) => {
   /* FIND THE farrest ONE */
   dogLicenses.forEach((dogLicense) => {
@@ -138,6 +153,7 @@ let updatedogLicensesFarest = (dogLicenses) => {
   });
 };
 
+/* Slide 1 */
 /* show the dog runs */
 
 const dogRunsStyle = {
@@ -175,6 +191,7 @@ const updateDogRunsMarkers = (dogRuns) => {
   });
 };
 
+/* Slide 2 */
 const updateDogRunsBiggest = (dogRuns) => {
   /* FIND THE BIGGEST ONE */
   dogRuns.forEach((dogRun) => {
@@ -204,6 +221,7 @@ const updateDogRunsBiggest = (dogRuns) => {
   });
 };
 
+/* Slide 5 */
 /* show the pet store */
 
 const petStoreStyle = {
@@ -233,15 +251,188 @@ const updatePetStoresMarkers = (petStores) => {
           .replaceAll(':', ':\ ')
           .replaceAll(',', '<br>')
           .toUpperCase(),
-        // PetStore.tags.forEach( tag => {
-        //   console.log(tag);
-        // })
-        // `<h6>${PetStore.tags[0]}</h6>`
       ).openPopup();
     });
   });
 };
 
+/* Slide 6 */
+/* show the pet hotels */
+
+const dogHotelStyle = {
+  color: '#1e1e1e',
+  fillColor: '#fed500',
+  fillOpacity: 0.3,
+};
+
+const updatedogHotelMarkers = (dogHotels) => {
+  /* celar layer  */
+  layerGroup.clearLayers();
+  let starCode = "&#11088 ";
+  /* fly to bounds  */
+  dogMap.flyToBounds(dogHotelBounds);
+  /* Loop each dog store to plot it */
+  dogHotels.forEach((dogHotel) => {
+    if (dogHotel.rating == null) {
+      dogHotel.rating = "No Record"
+      dogHotel.starNum = starCode.repeat(0);
+    } else {
+      dogHotel.starNum = starCode.repeat(Math.floor(dogHotel.rating));
+      }
+    if (dogHotel["user_ratings_total"] == null) {
+        dogHotel["user_ratings_total"] = "No Record";}
+    // console.log(dogHotel);
+    const circleMarker = L.circle([dogHotel.geometry.location.lat, dogHotel.geometry.location.lng], 40, dogHotelStyle)
+      .bindTooltip(dogHotel.name)
+      .addTo(layerGroup);
+    /* Add event listener */
+    circleMarker.addEventListener('click', () => {
+      circleMarker.bindPopup(
+        `
+        <h6><strong>&#127976 ${dogHotel.name}</strong></h6>
+        <ul>
+          <li><strong>Overall Rating:</strong> ${dogHotel["rating"].toString()} ${dogHotel.starNum} </li>
+          <li><strong>Number of Ratings:</strong> ${dogHotel["user_ratings_total"].toString()}</li>
+          <li><strong>Address:</strong> ${dogHotel["formatted_address"]}</li>
+          <li><a href='https://www.google.com/travel/hotels/${dogHotel.name}' target='_blank'><strong>Booking Now!</strong></a></li>
+        </ul>
+        `
+      ).openPopup();
+    });
+  });
+};
+/* Slide 7 */
+/* show the animal hospital */
+
+const animalHospitalStyle = {
+  color: '#73c471',
+  fillColor: '#fed500',
+  fillOpacity: 0.3,
+};
+
+const updateanimalHospitalMarkers = (animalHospitals) => {
+  /* celar layer  */
+  layerGroup.clearLayers();
+  let starCode = "&#11088 ";
+  /* fly to bounds  */
+  dogMap.flyToBounds(animalHospitalBounds);
+  /* Loop each dog store to plot it */
+  animalHospitals.forEach((animalHospital) => {
+    navigator.geolocation.getCurrentPosition(function(position) {
+      animalHospital.Mylocationlat  = position.coords.latitude;
+      animalHospital.Mylocationlng = position.coords.longitude;
+    });
+    if (animalHospital.rating == null) {
+      animalHospital.rating = "No Record"
+      animalHospital.starNum = starCode.repeat(0);
+    } else {
+      animalHospital.starNum = starCode.repeat(Math.floor(animalHospital.rating));
+      }
+    if (animalHospital["user_ratings_total"] == null) {
+      animalHospital["user_ratings_total"] = "No Record";}
+    // console.log(dogHotel);
+    const circleMarker = L.circle([animalHospital.geometry.location.lat, animalHospital.geometry.location.lng], 40, animalHospitalStyle)
+      .bindTooltip(animalHospital.name)
+      .addTo(layerGroup);
+    /* Add event listener */
+    circleMarker.addEventListener('click', () => {
+      circleMarker.bindPopup(
+        `
+        <h6><strong>&#127973 ${animalHospital.name}</strong></h6>
+        <ul>
+          <li><strong>Overall Rating:</strong> ${animalHospital["rating"].toString()} ${animalHospital.starNum} </li>
+          <li><strong>Number of Ratings:</strong> ${animalHospital["user_ratings_total"].toString()}</li>
+          <li><strong>Address:</strong> ${animalHospital["formatted_address"]}</li>
+          <li><a href='https://www.google.com/maps/dir/${animalHospital["formatted_address"]}/${animalHospital.Mylocationlat},${animalHospital.Mylocationlng}/' target='_blank'><strong>See a Vet Now!</strong></a></li>
+        </ul>
+        `
+      ).openPopup();
+    });
+  });
+};
+/* Slide 8 */
+/* Get a dog */
+
+const breederStyle = {
+  color: '#FFD000',
+  fillColor: '#FFD000',
+  fillOpacity: 0.5,
+};
+const resequeStyle = {
+  color: '#EF6190',
+  fillColor: '#EF6190',
+  fillOpacity: 0.5,
+};
+
+const legend = L.control({ position: "bottomleft"});
+legend.onAdd = function(map) {
+  var div = L.DomUtil.create("div", "legend");
+  div.innerHTML += "<center><h6>Legend</h6></center>";
+  div.innerHTML += '<i style="background: #FFD000"></i>Breeder<br>';
+  div.innerHTML += '<i style="background: #EF6190"></i>Rescue<br>';
+  return div;
+};
+
+const updateanimalGetMarkers = (getAnimals) => {
+  /* celar layer  */
+  layerGroup.clearLayers();
+  dogFriendGroup.clearLayers();
+  let starCode = "&#11088 ";
+  /* fly to bounds  */
+  dogMap.flyToBounds(getAnimalsBounds);
+  legend.addTo(dogMap);
+  /* Loop each dog store to plot it */
+  getAnimals.forEach((getAnimal) => {
+    if (getAnimal.rating == null) {
+      getAnimal.rating = "No Record"
+      getAnimal.starNum = starCode.repeat(0);
+    } else {
+      getAnimal.starNum = starCode.repeat(Math.floor(getAnimal.rating));
+      }
+    if (getAnimal["user_ratings_total"] == null) {
+      getAnimal["user_ratings_total"] = "No Record";}
+    // console.log(dogHotel);
+    if (getAnimal.tag == "Breeder") {
+      const circleMarker = L.circle([getAnimal.geometry.location.lat, getAnimal.geometry.location.lng], 200, breederStyle)
+        .bindTooltip(getAnimal.name)
+        .addTo(layerGroup);
+      /* Add event listener */
+      circleMarker.addEventListener('click', () => {
+        circleMarker.bindPopup(
+          `
+          <h6><strong>&#128021 ${getAnimal.name}</strong></h6>
+          <ul>
+            <li><strong>${getAnimal.tag}</strong></li>
+            <li><strong>Overall Rating:</strong> ${getAnimal["rating"].toString()} ${getAnimal.starNum} </li>
+            <li><strong>Number of Ratings:</strong> ${getAnimal["user_ratings_total"].toString()}</li>
+            <li><strong>Address:</strong> ${getAnimal["formatted_address"]}</li>
+            <li><a href='https://www.google.com/search?q=${getAnimal.name}' target='_blank'>More Info</a></li>
+          </ul>
+          `
+        ).openPopup();
+      });
+  } else {
+      const circleMarker = L.circle([getAnimal.geometry.location.lat, getAnimal.geometry.location.lng], 200, resequeStyle)
+      .bindTooltip(getAnimal.name)
+      .addTo(layerGroup);
+    /* Add event listener */
+    circleMarker.addEventListener('click', () => {
+      circleMarker.bindPopup(
+        `
+        <h6><strong>&#127973 ${getAnimal.name}</strong></h6>
+        <ul>
+          <li><strong>Overall Rating:</strong> ${getAnimal["rating"].toString()} ${getAnimal.starNum} </li>
+          <li><strong>Number of Ratings:</strong> ${getAnimal["user_ratings_total"].toString()}</li>
+          <li><strong>Address:</strong> ${getAnimal["formatted_address"]}</li>
+          <li><a href='https://www.google.com/search?q=${getAnimal.name.toString()}' target='_blank'>More Info</a></li>
+        </ul>
+        `
+      ).openPopup();
+    });
+  }
+  });
+};
+/* Slide 9 */
 /* show the dog dating */
 const icon = L.icon({
   iconUrl: 'dogPin.png',
@@ -255,13 +446,14 @@ const loadDogFile = function () {
     .then(resp => resp.json())
     .then(data => {
       // console.log(data);
+      dogMap.flyToBounds(animalHospitalBounds);
       dogFriendLayer = L.geoJSON(data, {
         pointToLayer: (feature, latlng) => {
           return L.marker(latlng, { icon })
           .bindTooltip(feature.properties.Name)
           .bindPopup(
             `<ul>
-              <li>Name: ${feature.properties.Name}</li>
+              <li>&#128054 Name: ${feature.properties.Name}</li>
               <li>Gender: ${feature.properties.Gender}</li>
               <li>Date of Birth: ${feature.properties.DOB}</li>
               <li>Contat: ${feature.properties.Email}</li>
@@ -307,10 +499,17 @@ function calcCurrentSlideIndex() {
       } else if (currentSlideIndex === 4) {
         updatedogLicensesFarest(dogLicenses);
       } else if (currentSlideIndex === 5) {
-        dogFriendGroup.clearLayers();
         updatePetStoresMarkers(petStores);
       } else if (currentSlideIndex === 6) {
+        updatedogHotelMarkers(dogHotels);
+      } else if (currentSlideIndex === 7) {
+        legend.remove(dogMap);
+        updateanimalHospitalMarkers(animalHospitals);
+      } else if (currentSlideIndex === 8) {
+        updateanimalGetMarkers(getAnimals);
+      } else if (currentSlideIndex === 9) {
         layerGroup.clearLayers();
+        legend.remove(dogMap);
         loadDogFile();
       }
     }
