@@ -29,17 +29,17 @@ const petStoresBound = [
 const dogHotelBounds = [
   [40.714, -74.00732809334068],
   [40.773, -73.92063619987687],
-]
+];
 
 const animalHospitalBounds = [
   [40.70312926895238, -74.05706625030707],
   [40.813913064585954, -73.93711569084002],
-]
+];
 
 const getAnimalsBounds = [
   [40.50116870956662, -73.86125551107805],
-  [40.946431509357446, -73.70928444948223]
-]
+  [40.946431509357446, -73.70928444948223],
+];
 /* Slide 3 */
 /* show the dog breeds */
 
@@ -73,8 +73,8 @@ const updatedogLicensesMarkers = (dogLicenses) => {
         <li>Age: ${dogLicense.properties.Age.toString()} </li>
         <li>Female %: ${dogLicense.properties.Femalperc.toString()} </li>
         <li>Male %: ${dogLicense.properties.Maleperc.toString()} </li></ul>`,
-        ).openPopup();
-      });
+      ).openPopup();
+    });
   });
 };
 
@@ -93,7 +93,7 @@ const zipCodeBoundary = (zipcode) => {
   });
 };
 
-$('#form1').submit( function(e) {
+$('#form1').submit(function (e) {
   e.preventDefault();
   const selectZipcodeElement = document.getElementById('zipcodeTypeIn');
   selectZipcode = selectZipcodeElement.value;
@@ -106,7 +106,7 @@ let zipCodedogLicenses = (selectZipcode) => {
   /* celar layer  */
   layerGroup.clearLayers();
   /* Loop each dog store to plot it */
-  dogLicenses.forEach( (dogLicense) => {
+  dogLicenses.forEach((dogLicense) => {
     if (dogLicense.properties.GEOID.toString() === selectZipcode) {
       const circleMarker = L.circle([dogLicense.geometry.coordinates[1], dogLicense.geometry.coordinates[0]], 40, dogLicensesStyle)
         .bindTooltip(dogLicense.properties.GEOID.toString())
@@ -162,34 +162,62 @@ const dogRunsStyle = {
   opacity: 0.65,
 };
 
-const dogRunBound = L.geoJSON(dogRuns, { style: dogRunsStyle });
+const dogRunsBtn = document.querySelector('.dogRunsMap button');
 
-const updateDogRunsMarkers = (dogRuns) => {
+const dogRunBound = [
+  [40.499703081749566, -74.25521850585938],
+  [40.901576859936284, -73.83087158203125],
+];
+
+const weatherInfo = document.querySelector('#weatherInfo');
+const weatherApiKey = '2c441729b4e371a2722f9ea5913ae21a';
+fetch(`https://api.openweathermap.org/data/2.5/weather?lat=40.76556538211533&lon=-73.96458151137222&appid=${weatherApiKey}`)
+  .then((response) => response.json())
+  .then((data) => {
+    const NYCtemperature = Math.round((data.main.temp - 273.15) * (9 / 5) + 32).toString() + ' Fahrenheit';
+    const NYChumidity = data.main.humidity.toString() + ' %';
+    const NYCwind = data.wind.speed.toString() + ' meter/sec';
+    weatherInfo.innerHTML = `
+    <strong>Today's Weather</strong>
+    <br>
+    Temperature: ${NYCtemperature}
+    <br>
+    Humidity: ${NYChumidity}
+    <br>
+    Wind Speed: ${NYCwind}
+    `;
+  });
+
+const updateDogRunsMarkers = () => {
   /* celar layer  */
   layerGroup.clearLayers();
   /* fly to bounds  */
-  dogMap.flyToBounds(dogRunBound.getBounds());
+  dogMap.flyToBounds(dogRunBound);
   /* Loop each dog run to plot it */
   dogRuns.forEach((dogRun) => {
     const dogRunpolygon = L.geoJSON([dogRun], { style: dogRunsStyle })
-      .bindTooltip(dogRun.properties.name)
-      .addTo(layerGroup);
-    /* Add event listener */
-    dogRunpolygon.addEventListener('click', () => {
-      dogMap.flyToBounds(dogRunpolygon.getBounds());
-      dogRunpolygon.bindTooltip(
+      .bindTooltip(
         `<h6>${dogRun.properties.name}</h6>
         <ul>
           <li>Zipcode:${dogRun.properties.zipcode} </li>
           <li>Area: ${Math.round(dogRun.properties.area)} sqm</li>
-          <li><a href='https://www.google.com/search?q=${dogRun.properties.name}' target='_blank'>More Info</a></li></ul>`,
+        </ul>`,
       ).addTo(layerGroup);
-      dogRunpolygon.addEventListener('click', () => {
-        updateDogRunsMarkers(dogRuns);
-      });
+    /* Add event listener */
+    dogRunpolygon.addEventListener('click', () => {
+      dogMap.flyToBounds(dogRunpolygon.getBounds());
+      dogRunpolygon.bindPopup(
+        `<h6><strong>&#127795 ${dogRun.properties.name}</strong></h6>
+        <ul>
+          <li><strong>Zipcode:</strong>${dogRun.properties.zipcode} </li>
+          <li><strong>Area:<strong> ${Math.round(dogRun.properties.area)} sqm</li>
+          <li><a href='https://www.google.com/search?q=${dogRun.properties.name}' target='_blank'><strong>More Info</strong></a></li>
+        </ul>`,
+      ).openPopup();
     });
   });
 };
+dogRunsBtn.addEventListener('click', updateDogRunsMarkers);
 
 /* Slide 2 */
 const updateDogRunsBiggest = (dogRuns) => {
@@ -209,11 +237,11 @@ const updateDogRunsBiggest = (dogRuns) => {
       /* Add event listener */
       dogRunpolygon.addEventListener('click', () => {
         dogRunpolygon.bindPopup(
-          `<h6>${dogRun.properties.name}</h6>
+          `<h6><strong>&#127795 ${dogRun.properties.name}</strong></h6>
           <ul>
-            <li>Zipcode:${dogRun.properties.zipcode} </li>
-            <li>Area: ${Math.round(dogRun.properties.area)}</li>
-            <li><a href='https://www.google.com/search?q=${dogRun.properties.name}'>More Info</a></li>
+            <li><strong>Zipcode:</strong>${dogRun.properties.zipcode} </li>
+            <li><strong>Area:<strong> ${Math.round(dogRun.properties.area)} sqm</li>
+            <li><a href='https://www.google.com/search?q=${dogRun.properties.name}' target='_blank'><strong>More Info</strong></a></li>
           </ul>`,
         ).openPopup();
       });
@@ -237,20 +265,22 @@ const updatePetStoresMarkers = (petStores) => {
   dogMap.flyToBounds(petStoresBound);
   /* Loop each dog store to plot it */
   petStores.forEach((PetStore) => {
-    const circleMarker = L.circle([PetStore.lat, PetStore.lon], 40, petStoreStyle)
+    const circleMarker = L.circle([PetStore.lat, PetStore.lon], 100, petStoreStyle)
       .bindTooltip(PetStore.tags.name)
       .addTo(layerGroup);
     /* Add event listener */
     circleMarker.addEventListener('click', () => {
       circleMarker.bindPopup(
-        JSON.stringify(PetStore.tags)
-          .replace('{', '')
-          .replace('}', '')
-          .replaceAll('"', '')
-          .replaceAll('addr:', '')
-          .replaceAll(':', ':\ ')
-          .replaceAll(',', '<br>')
-          .toUpperCase(),
+        `<b>${PetStore.tags.name}</b>
+        <br>
+        ${JSON.stringify(PetStore.tags)
+    .replace('{', '')
+    .replace('}', '')
+    .replaceAll('"', '')
+    .replaceAll('addr:', '')
+    .replaceAll(':', ': ')
+    .replaceAll(',', '<br>')
+    .toUpperCase()},`,
       ).openPopup();
     });
   });
@@ -268,20 +298,18 @@ const dogHotelStyle = {
 const updatedogHotelMarkers = (dogHotels) => {
   /* celar layer  */
   layerGroup.clearLayers();
-  let starCode = "&#11088 ";
+  const starCode = '&#11088 ';
   /* fly to bounds  */
   dogMap.flyToBounds(dogHotelBounds);
   /* Loop each dog store to plot it */
   dogHotels.forEach((dogHotel) => {
     if (dogHotel.rating == null) {
-      dogHotel.rating = "No Record"
+      dogHotel.rating = 'No Record';
       dogHotel.starNum = starCode.repeat(0);
     } else {
       dogHotel.starNum = starCode.repeat(Math.floor(dogHotel.rating));
-      }
-    if (dogHotel["user_ratings_total"] == null) {
-        dogHotel["user_ratings_total"] = "No Record";}
-    // console.log(dogHotel);
+    }
+    if (dogHotel.user_ratings_total == null) { dogHotel.user_ratings_total = 'No Record'; }
     const circleMarker = L.circle([dogHotel.geometry.location.lat, dogHotel.geometry.location.lng], 40, dogHotelStyle)
       .bindTooltip(dogHotel.name)
       .addTo(layerGroup);
@@ -291,12 +319,12 @@ const updatedogHotelMarkers = (dogHotels) => {
         `
         <h6><strong>&#127976 ${dogHotel.name}</strong></h6>
         <ul>
-          <li><strong>Overall Rating:</strong> ${dogHotel["rating"].toString()} ${dogHotel.starNum} </li>
-          <li><strong>Number of Ratings:</strong> ${dogHotel["user_ratings_total"].toString()}</li>
-          <li><strong>Address:</strong> ${dogHotel["formatted_address"]}</li>
+          <li><strong>Overall Rating:</strong> ${dogHotel.rating.toString()} ${dogHotel.starNum} </li>
+          <li><strong>Number of Ratings:</strong> ${dogHotel.user_ratings_total.toString()}</li>
+          <li><strong>Address:</strong> ${dogHotel.formatted_address}</li>
           <li><a href='https://www.google.com/travel/hotels/${dogHotel.name}' target='_blank'><strong>Booking Now!</strong></a></li>
         </ul>
-        `
+        `,
       ).openPopup();
     });
   });
@@ -313,24 +341,22 @@ const animalHospitalStyle = {
 const updateanimalHospitalMarkers = (animalHospitals) => {
   /* celar layer  */
   layerGroup.clearLayers();
-  let starCode = "&#11088 ";
+  const starCode = '&#11088 ';
   /* fly to bounds  */
   dogMap.flyToBounds(animalHospitalBounds);
   /* Loop each dog store to plot it */
   animalHospitals.forEach((animalHospital) => {
-    navigator.geolocation.getCurrentPosition(function(position) {
-      animalHospital.Mylocationlat  = position.coords.latitude;
+    navigator.geolocation.getCurrentPosition(function (position) {
+      animalHospital.Mylocationlat = position.coords.latitude;
       animalHospital.Mylocationlng = position.coords.longitude;
     });
     if (animalHospital.rating == null) {
-      animalHospital.rating = "No Record"
+      animalHospital.rating = 'No Record';
       animalHospital.starNum = starCode.repeat(0);
     } else {
       animalHospital.starNum = starCode.repeat(Math.floor(animalHospital.rating));
-      }
-    if (animalHospital["user_ratings_total"] == null) {
-      animalHospital["user_ratings_total"] = "No Record";}
-    // console.log(dogHotel);
+    }
+    if (animalHospital.user_ratings_total == null) { animalHospital.user_ratings_total = 'No Record'; }
     const circleMarker = L.circle([animalHospital.geometry.location.lat, animalHospital.geometry.location.lng], 40, animalHospitalStyle)
       .bindTooltip(animalHospital.name)
       .addTo(layerGroup);
@@ -340,12 +366,12 @@ const updateanimalHospitalMarkers = (animalHospitals) => {
         `
         <h6><strong>&#127973 ${animalHospital.name}</strong></h6>
         <ul>
-          <li><strong>Overall Rating:</strong> ${animalHospital["rating"].toString()} ${animalHospital.starNum} </li>
-          <li><strong>Number of Ratings:</strong> ${animalHospital["user_ratings_total"].toString()}</li>
-          <li><strong>Address:</strong> ${animalHospital["formatted_address"]}</li>
-          <li><a href='https://www.google.com/maps/dir/${animalHospital["formatted_address"]}/${animalHospital.Mylocationlat},${animalHospital.Mylocationlng}/' target='_blank'><strong>See a Vet Now!</strong></a></li>
+          <li><strong>Overall Rating:</strong> ${animalHospital.rating.toString()} ${animalHospital.starNum} </li>
+          <li><strong>Number of Ratings:</strong> ${animalHospital.user_ratings_total.toString()}</li>
+          <li><strong>Address:</strong> ${animalHospital.formatted_address}</li>
+          <li><a href='https://www.google.com/maps/dir/${animalHospital.formatted_address}/${animalHospital.Mylocationlat},${animalHospital.Mylocationlng}/' target='_blank'><strong>See a Vet Now!</strong></a></li>
         </ul>
-        `
+        `,
       ).openPopup();
     });
   });
@@ -364,10 +390,10 @@ const resequeStyle = {
   fillOpacity: 0.5,
 };
 
-const legend = L.control({ position: "bottomleft"});
-legend.onAdd = function(map) {
-  var div = L.DomUtil.create("div", "legend");
-  div.innerHTML += "<center><h6>Legend</h6></center>";
+const legend = L.control({ position: 'bottomleft' });
+legend.onAdd = function (map) {
+  const div = L.DomUtil.create('div', 'legend');
+  div.innerHTML += '<center><h6>Legend</h6></center>';
   div.innerHTML += '<i style="background: #FFD000"></i>Breeder<br>';
   div.innerHTML += '<i style="background: #EF6190"></i>Rescue<br>';
   return div;
@@ -377,22 +403,20 @@ const updateanimalGetMarkers = (getAnimals) => {
   /* celar layer  */
   layerGroup.clearLayers();
   dogFriendGroup.clearLayers();
-  let starCode = "&#11088 ";
+  const starCode = '&#11088 ';
   /* fly to bounds  */
   dogMap.flyToBounds(getAnimalsBounds);
   legend.addTo(dogMap);
   /* Loop each dog store to plot it */
   getAnimals.forEach((getAnimal) => {
     if (getAnimal.rating == null) {
-      getAnimal.rating = "No Record"
+      getAnimal.rating = 'No Record';
       getAnimal.starNum = starCode.repeat(0);
     } else {
       getAnimal.starNum = starCode.repeat(Math.floor(getAnimal.rating));
-      }
-    if (getAnimal["user_ratings_total"] == null) {
-      getAnimal["user_ratings_total"] = "No Record";}
-    // console.log(dogHotel);
-    if (getAnimal.tag == "Breeder") {
+    }
+    if (getAnimal.user_ratings_total === null) { getAnimal.user_ratings_total = 'No Record'; }
+    if (getAnimal.tag === 'Breeder') {
       const circleMarker = L.circle([getAnimal.geometry.location.lat, getAnimal.geometry.location.lng], 200, breederStyle)
         .bindTooltip(getAnimal.name)
         .addTo(layerGroup);
@@ -403,33 +427,34 @@ const updateanimalGetMarkers = (getAnimals) => {
           <h6><strong>&#128021 ${getAnimal.name}</strong></h6>
           <ul>
             <li><strong>${getAnimal.tag}</strong></li>
-            <li><strong>Overall Rating:</strong> ${getAnimal["rating"].toString()} ${getAnimal.starNum} </li>
-            <li><strong>Number of Ratings:</strong> ${getAnimal["user_ratings_total"].toString()}</li>
-            <li><strong>Address:</strong> ${getAnimal["formatted_address"]}</li>
+            <li><strong>Overall Rating:</strong> ${getAnimal.rating.toString()} ${getAnimal.starNum} </li>
+            <li><strong>Number of Ratings:</strong> ${getAnimal.user_ratings_total.toString()}</li>
+            <li><strong>Address:</strong> ${getAnimal.formatted_address}</li>
             <li><a href='https://www.google.com/search?q=${getAnimal.name}' target='_blank'>More Info</a></li>
           </ul>
-          `
+          `,
         ).openPopup();
       });
-  } else {
+    } else {
       const circleMarker = L.circle([getAnimal.geometry.location.lat, getAnimal.geometry.location.lng], 200, resequeStyle)
-      .bindTooltip(getAnimal.name)
-      .addTo(layerGroup);
-    /* Add event listener */
-    circleMarker.addEventListener('click', () => {
-      circleMarker.bindPopup(
-        `
-        <h6><strong>&#127973 ${getAnimal.name}</strong></h6>
-        <ul>
-          <li><strong>Overall Rating:</strong> ${getAnimal["rating"].toString()} ${getAnimal.starNum} </li>
-          <li><strong>Number of Ratings:</strong> ${getAnimal["user_ratings_total"].toString()}</li>
-          <li><strong>Address:</strong> ${getAnimal["formatted_address"]}</li>
-          <li><a href='https://www.google.com/search?q=${getAnimal.name.toString()}' target='_blank'>More Info</a></li>
-        </ul>
-        `
-      ).openPopup();
-    });
-  }
+        .bindTooltip(getAnimal.name)
+        .addTo(layerGroup);
+      /* Add event listener */
+      circleMarker.addEventListener('click', () => {
+        circleMarker.bindPopup(
+          `
+          <h6><strong>&#127973 ${getAnimal.name}</strong></h6>
+          <ul>
+            <li><strong>${getAnimal.tag}</strong></li>
+            <li><strong>Overall Rating:</strong> ${getAnimal.rating.toString()} ${getAnimal.starNum} </li>
+            <li><strong>Number of Ratings:</strong> ${getAnimal.user_ratings_total.toString()}</li>
+            <li><strong>Address:</strong> ${getAnimal.formatted_address}</li>
+            <li><a href='https://www.google.com/search?q=${getAnimal.name}' target='_blank'>More Info</a></li>
+          </ul>
+          `,
+        ).openPopup();
+      });
+    }
   });
 };
 /* Slide 9 */
@@ -437,35 +462,33 @@ const updateanimalGetMarkers = (getAnimals) => {
 const icon = L.icon({
   iconUrl: 'dogPin.png',
   iconSize: [30, 45],
-  iconAnchor: [15, 45]
+  iconAnchor: [15, 45],
 });
 
 let dogFriendLayer = null;
 const loadDogFile = function () {
   fetch(`${apiHost}/dogprofiles/`)
-    .then(resp => resp.json())
-    .then(data => {
-      // console.log(data);
+    .then((resp) => resp.json())
+    .then((data) => {
       dogMap.flyToBounds(animalHospitalBounds);
       dogFriendLayer = L.geoJSON(data, {
         pointToLayer: (feature, latlng) => {
           return L.marker(latlng, { icon })
-          .bindTooltip(feature.properties.Name)
-          .bindPopup(
-            `<ul>
-              <li>&#128054 Name: ${feature.properties.Name}</li>
-              <li>Gender: ${feature.properties.Gender}</li>
-              <li>Date of Birth: ${feature.properties.DOB}</li>
-              <li>Contat: ${feature.properties.Email}</li>
-              <li>Availability: ${feature.properties.Availability}</li>
-            </ul>`
+            .bindTooltip(feature.properties.Name)
+            .bindPopup(
+              `<ul>
+                <li>&#128054 Name: ${feature.properties.Name}</li>
+                <li>Gender: ${feature.properties.Gender}</li>
+                <li>Date of Birth: ${feature.properties.DOB}</li>
+                <li>Contat: ${feature.properties.Email}</li>
+                <li>Availability: ${feature.properties.Availability}</li>
+              </ul>`,
             ).openPopup();
         },
       });
       dogFriendLayer.addTo(dogFriendGroup);
     });
 };
-
 
 /* current slide index */
 let currentSlideIndex = -1;

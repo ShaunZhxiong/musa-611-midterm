@@ -12,20 +12,18 @@ const dogRegisterEmail = document.querySelector('#email');
 const dogRegisterDOB = document.querySelector('#birth-datetime');
 const dogRegisterGender = document.querySelector('#gender');
 const checkboxes = document.querySelectorAll('#multiAvailabilites input');
-let checkboxVals = "";
-const checkboxFunct = function() {
-  for (let i =0, n=checkboxes.length; i<n; i++)
-  {
-    if (checkboxes[i].checked)
-    {
-      checkboxVals += "," + checkboxes[i].id;
+let checkboxVals = '';
+const checkboxFunct = function () {
+  for (let i = 0, n = checkboxes.length; i < n; i++) {
+    if (checkboxes[i].checked) {
+      checkboxVals += ',' + checkboxes[i].id;
     }
   }
-  if (checkboxVals) checkboxVals=checkboxVals.substring(1);
-}
+  if (checkboxVals) checkboxVals = checkboxVals.substring(1);
+};
 // hide steps
 const hideAllRegisterSteps = function () {
-  for (const stepEl of registerReportStepEls) {                         // (1)
+  for (const stepEl of registerReportStepEls) {
     stepEl.classList.add('hidden');
   }
   dogMap.removeEventListener('click', handlePointSelection);
@@ -33,18 +31,16 @@ const hideAllRegisterSteps = function () {
 };
 // click register and show registeration form
 const openRegisterForm = function () {
-    console.log('Opening the form.');
-    registerToggleEl.classList.add('hidden');
-    registerReportFormEl.classList.remove('hidden');
-  };
+  registerToggleEl.classList.add('hidden');
+  registerReportFormEl.classList.remove('hidden');
+};
 
 // close form
 const closeRegisterForm = function () {
-    console.log('Closing the form.');
-    hideAllRegisterSteps();
-    registerToggleEl.classList.remove('hidden');
-    registerReportFormEl.classList.add('hidden');
-  };
+  hideAllRegisterSteps();
+  registerToggleEl.classList.remove('hidden');
+  registerReportFormEl.classList.add('hidden');
+};
 
 // reset register form
 const resetRegisterForm = function () {
@@ -56,42 +52,38 @@ let reportMarker = null;
 let reportMarkers = L.layerGroup().addTo(dogMap);
 // select dog location
 const showSelectPointStep = function () {
-  console.log('Showing the select-point step.');
-  openRegisterForm();                                      // (1)
-  hideAllRegisterSteps();             // (2)
-  dogMap.addEventListener('click', handlePointSelection);     // (3)
-  selectLocationStepEl.classList.remove('hidden');                 // (4)
+  openRegisterForm();
+  hideAllRegisterSteps();
+  dogMap.addEventListener('click', handlePointSelection);
+  selectLocationStepEl.classList.remove('hidden');
 };
 
 const handlePointSelection = function (evt) {
-  if (reportMarker) {                            // (1)
+  if (reportMarker) {
     reportMarkers.removeLayer(reportMarker);
   }
-  const clickedPoint = turf.point([              // (2)
+  const clickedPoint = turf.point([
     evt.latlng.lng,
-    evt.latlng.lat
+    evt.latlng.lat,
   ]);
-  reportMarker = L.marker([                      // (3)
+  reportMarker = L.marker([
     clickedPoint.geometry.coordinates[1],
     clickedPoint.geometry.coordinates[0],
   ]);
   reportMarker.addTo(reportMarkers);
-  selectLocationContinueBtn.disabled = false;       // (4)
+  selectLocationContinueBtn.disabled = false;
 };
 
 // enter details
 const showDetailsStep = function () {
-  console.log('Showing the details step of Registeration.');
-  openRegisterForm();                                      // (1)
+  openRegisterForm();
   hideAllRegisterSteps();
   reportMarker.addTo(reportMarkers);
-  // dogMap.addLayer(reportMarker);                                   // (3)
-  detailsStepEl.classList.remove('hidden');                     // (4)
+  detailsStepEl.classList.remove('hidden');
 };
 
 // submit registration
 const submitIssueReportFormData = function () {
-  console.log('Submitting the issue data.');
   const dogLatLng = reportMarker.getLatLng();
   const dogData = {
     type: 'Feature',
@@ -107,17 +99,14 @@ const submitIssueReportFormData = function () {
       Email: dogRegisterEmail.value,
     },
   };
-  console.log(dogData);
   fetch(`${apiHost}/dogprofiles/`, {
     method: 'post',
     body: JSON.stringify(dogData),
     headers: { 'Content-Type': 'application/json' },
   })
-    .then(resp => resp.json())
-    .then(data => {
-      console.log('Received the following response:');
-      console.log(data);
-      dogFriendLayer.addData(data);  // (1)
+    .then((resp) => resp.json())
+    .then((data) => {
+      dogFriendLayer.addData(data);
     });
 };
 

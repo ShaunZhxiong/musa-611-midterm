@@ -4,10 +4,10 @@ body {
   font-family: 'Fredoka';
   color: aliceblue;
 }
-
 button {
-  background-color: #B6E59E;
-  border: 1px solid gray;
+  background-color: #f12f6c;
+  border: aliceblue;
+  color: aliceblue;
   margin-top: 1rem;
   padding: 0.5rem 1rem;
   border-radius: 0.8rem;
@@ -17,9 +17,9 @@ button {
 }
 .direction{
   width: 2rem;
-  height: 1052vh;
+  height: 1155vh;
   margin-left: auto;
-  margin-top: -1052vh;
+  margin-top: -1155vh;
   padding: 0vw;
   color: rgb(0, 0, 0);
   background-color:transparent;
@@ -60,14 +60,17 @@ label {
 }
 .register-form {
   position: relative;
-  padding-left: 2rem;
+  /* padding-left: 1rem; */
   padding-right: 2rem;
   padding-bottom: 1rem;
+}
+.step-select-location {
+  margin-top: 2rem;
 }
 .register-form-closer button{
   background-color: #5f5f5f;
   border: 1px solid red;
-  padding: 0.5rem 1rem;
+  /* padding: 0.5rem 1rem; */
   border-radius: 0.8rem;
   font-size: 1rem;
   width: 25%;
@@ -86,6 +89,13 @@ label {
 .map-container,
 .slides{
   border: 1px solid white;
+}
+#weatherInfo{
+  margin: 1rem 0 1rem 0;
+  padding: 0.5rem;
+  color: black;
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 25px;
 }
 .slide{
   width: 25rem;
