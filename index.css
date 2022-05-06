@@ -17,9 +17,9 @@ button {
 }
 .direction{
   width: 2rem;
-  height: 1155vh;
+  height: 1175vh;
   margin-left: auto;
-  margin-top: -1155vh;
+  margin-top: -1175vh;
   padding: 0vw;
   color: rgb(0, 0, 0);
   background-color:transparent;
@@ -114,7 +114,7 @@ label {
   position: relative;
 }
 #BiggestDogRuns{
-  width: 20rem;
+  width: 22rem;
   position: relative;
 }
 #zip-code-select{
